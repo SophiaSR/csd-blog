@@ -59,7 +59,7 @@ One possibility is we don't notice this mistake until we run our code, and then 
 With our squaring example, this means that since the ``square`` function takes in a number and outputs a number, the input we actually give the function when we call it must also be a number, and a type error will be raised if this is not the case. We can do these sorts of checks without actually running the code, because at this stage we don't care what the value of any term is, just whether it has the right *type*. Most languages in use today have some kind of static type system including languages such as Java, Haskell, OCaml, C, and many others. Python, on the other hand, does not.
 
 # Substructural Types
-SSo now we have some understanding of what a type system does and how we can formally define one. Substructural types extend the usual type systems with a way to track how exactly variables in the program are used. This gives rise to some guarantees about which compiler optimizations are safe to perform.
+So now we have some understanding of what a type system does. Substructural types extend the usual type systems with a way to track how exactly variables in the program are used. This gives rise to some guarantees about which compiler optimizations are safe to perform.
 
 We now think of variables as resources that we can consume or not.
 
@@ -117,9 +117,8 @@ If the number is zero, then we return two copies of zero. If the number is the s
 
  ```
  defn square (x : nat) : nat = 
-    y = copy x
-    match y with 
-    | (y1,y2) => y1 * y2
+    match (copy x) with 
+    |(y1,y2) => y1 * y2
 ```
 We were able to do this because of how we defined ``nat``, but it is not always possible to define such copy functions for all types. It is also impossible to define a general copy function and must be defined for each type. Similarly, in the first example, we were able to just read the second input and ignore its value, but this is again not always possible to do. This is a large amount of overhead just to be able to (sometimes) reuse or drop data we have defined.
 
@@ -167,7 +166,7 @@ Next, let’s define lists of unary numbers. This gets a bit more interesting as
 ```
 type list[m k] = +{'nil:1, 'cons: <nat[k]> * <list[m k]>}
 ```
-The annotation \\([m\ k]\\) says that the type ``nat`` has the mode \\(m\\) and the mode \\(k\\) appears in the definition as well.
+The annotation \\([m\ k]\\) says that the type ``list`` has the mode \\(m\\) and the mode \\(k\\) appears in the definition as well.
 
 Looking at the type definition itself, we see that a list can either be empty (represented by the tag ``'nil``) or ``'cons`` of an element and the rest of the list. The interesting thing here is the representation of the elements. While the mode of all the components of the ``'cons`` need to be at the same mode, we can still have the elements of the list appear at a different mode by wrapping the elements in a (down) shift. The nats themselves can be at the mode \\(k\\) while allowing the full list to still be at the mode \\(m\\).
 
